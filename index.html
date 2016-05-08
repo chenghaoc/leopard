@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title></title>
+</head>
+<body>
+<div id='container'></div>
+<button id='start'> start</button>
+<script src='schedule.js'></script>
+<script>
+  document.querySelector('#start').addEventListener('click', function(e) {
+    var bag = []
+    Schedule.start()
+    Schedule.put(1, function () {
+      var div = document.createElement('div')
+      div.style.width = Math.random() * 50 + 'px'
+      div.style.height = 20 + 'px'
+      div.style['background-color'] =
+       `#${Math.floor(Math.random() * 10)}${Math.floor(Math.random() * 10)}${Math.floor(Math.random() * 10)}`
+      div.style.float = 'left'
+      bag.push(div)
+      document.querySelector('#container').appendChild(div)
+    }, 50000)
+    // Schedule.put(2, function () {
+    //   console.log(bag);
+    //   var fra = document.createDocumentFragment();
+    //   bag.forEach(item => fra.appendChild(item))
+    //   document.querySelector('#container').appendChild(fra)
+    // }, 1)
+  })
+</script>
+</body>
+</html>
