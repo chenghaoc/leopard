@@ -4,30 +4,94 @@
   <title></title>
 </head>
 <body>
-<div id='container'></div>
-<button id='start'> start</button>
+<div id='container0'></div>
+<div id='container1'></div>
+<div style="position: fixed;right: 0;" id='state'></div>
+<button id='add'>add</button>
+<button id='button'>run</button>
 <script src='schedule.js'></script>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/stats.js/r16/Stats.min.js'></script>
 <script>
-  document.querySelector('#start').addEventListener('click', function(e) {
-    var bag = []
-    Schedule.start()
-    Schedule.put(1, function () {
-      var div = document.createElement('div')
-      div.style.width = Math.random() * 50 + 'px'
-      div.style.height = 20 + 'px'
-      div.style['background-color'] =
-       `#${Math.floor(Math.random() * 10)}${Math.floor(Math.random() * 10)}${Math.floor(Math.random() * 10)}`
-      div.style.float = 'left'
-      bag.push(div)
-      document.querySelector('#container').appendChild(div)
-    }, 50000)
-    // Schedule.put(2, function () {
-    //   console.log(bag);
-    //   var fra = document.createDocumentFragment();
-    //   bag.forEach(item => fra.appendChild(item))
-    //   document.querySelector('#container').appendChild(fra)
-    // }, 1)
-  })
+  var stats = new Stats();
+  stats.showPanel( 0 ); // 0: fps, 1: ms, 2: mb, 3+: custom
+  console.log(stats);
+  document.querySelector('#state').appendChild( stats.domElement );
+  function animate() {
+      stats.begin();
+      // monitored code goes here
+      stats.end();
+      requestAnimationFrame( animate );
+  }
+  requestAnimationFrame( animate );
+
+  var actions = []
+  Schedule.start()
+
+
+  var level = 0
+
+  while(level ++ < 20) {
+    add(level)
+    Schedule.once(20, function() {
+      Schedule.stop()
+    })
+  }
+  function add(l) {
+      var bag = []
+      var container = document.createElement('div');
+      document.body.appendChild(container)
+      Schedule.put(l, function () {
+        var div = document.createElement('div')
+        div.style.width = Math.random() * 20 + 'px'
+        div.style.height = '10px'
+        div.style['background-color'] =
+          `#${Math.floor(Math.random() * 10)}${Math.floor(Math.random() * 10)}${Math.floor(Math.random() * 10)}`
+        div.style.display = 'inline-block'
+        container.appendChild(div)
+        bag.push(div)
+      }, 50)
+      actions.push(function() {
+        bag.filter(function() {
+          return Math.random() > 0.5
+        }).forEach(function(item) {
+          var local = l
+          Schedule.put(l, function () {
+            container.appendChild(item)
+          })
+        })
+      })
+    }
+  document.querySelector('#add').addEventListener('click', function(e) {
+    add(level++)
+  });
+  document.querySelector('#button').addEventListener('click', function(e) {
+    setInterval(function() {
+      actions.forEach(action => action())
+    }, 30)
+  });
+
+  // Schedule.put(1, function () {
+  //   var div = document.createElement('div')
+  //   div.style.width = Math.random() * 20 + 'px'
+  //   div.style.height = '100px'
+  //   div.style['background-color'] =
+  //     `#${Math.floor(Math.random() * 10)}${Math.floor(Math.random() * 10)}${Math.floor(Math.random() * 10)}`
+  //   div.style.display = 'inline-block'
+  //   document.querySelector('#container2').appendChild(div)
+  //   bag2.push(div)
+  // }, 50)
+
+  
+
+  // document.querySelector('#start2').addEventListener('click', function(e) {
+  //   bag2.filter(function() {
+  //     return Math.random() > 0.5
+  //   }).forEach(function(item) {
+  //     Schedule.put(1, function () {
+  //       document.querySelector('#container2').appendChild(item)
+  //     })
+  //   })
+  // })
 </script>
 </body>
 </html>
