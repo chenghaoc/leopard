@@ -25,19 +25,17 @@ Emitter.prototype.once = function(level, callback) {
   })
 }
 
-
-
 var rAF = requestAnimationFrame
 
+var perFrame = 16
 var Schedule = {}
 var queue = []
 var counter = 0
 var limit = 10
 var balance = limit
-var goal = 17
+var goal = perFrame
 var isRunning = false
 var accelerate = 1 // for slow start
-var multiplier = 2
 
 var scriptStart
 var scriptEnd
@@ -50,86 +48,85 @@ var emitter = new Emitter()
 
 for (let i = 0; i < 1000; i ++) queue.push([])
 
-
 function frame(frameStart) {
   if (!isRunning) return
-  // styleEnd = frameStart
 
-  
+  // calculate metrix
   styleEnd = frameStart
-  styleDuration = styleEnd - styleStart
+  styleDuration = styleStart ? (styleEnd - styleStart) : goal
   scriptDuration = scriptEnd - scriptStart
   scriptStart = now()
-
-
-
-  // console.log(styleDuration)
-  // console.log(scriptDuration)
-  // if (styleDuration < 17) {
-    // console.log(styleDuration);
-    console.log(styleDuration);
-    if (styleDuration < goal && styleDuration !== 0) {
-      accelerate = accelerate * 2
-      limit += accelerate
-      balance = limit
-    } else if (styleDuration >= goal) {
-      hit = true
-      accelerate = 1
-      limit = Math.floor(limit / 2)
-    } else {}
-  // } else {
-  //   limit = limit * multiplier
-  //   // multiplier = multiplier * 2
-  // }
+  // calculate limit
+  if (goal < styleDuration && styleDuration < goal + 1 &&
+      styleDuration !== 0) {
+    accelerate = accelerate * 2
+    limit += accelerate
+  } else if (styleDuration >= goal) {
+    accelerate = 1
+    limit = Math.floor(limit / 2)
+  } else if (styleDuration === 0) {
+    // This is a skipped frame
+  }
   if (limit < 1)
     limit = 1
-  // console.log(accelerate);
-  // console.log(styleDuration);
-  var count = limit
+
+  run(limit)
+  scriptEnd = now()
+  styleStart = frameStart
+  
+  rAF(frame)
+  if (window && window.requestIdleCallback) {
+    // For browsers which support requestIdleCallback
+    requestIdleCallback(function(deadline) {
+      if (deadline.timeRemaining() > 0) {
+        var ratio = deadline.timeRemaining() / perFrame
+        run(Math.floor(limit * ratio))
+      }
+    })
+  }
+}
+
+function run(count) {
   for (var i = 0; i < queue.length; i ++) {
     if (count < 1) break
     var level = queue[i]
     while (level.length) {
       if (count < 1) break
       counter --
-      level.shift()()
-      if (!level.length)
-        emitter.emit(i)
-      count --
+      // the bigger of level, the less emergent to complete
+      // So we deduce more for higher level (lower priority) actions
+      count = count - i * i
+      var callback = level.shift()
+      if (callback && typeof callback === 'function') callback()
+      if (!level.length) emitter.emit(i)
     }
     if (i === queue.length - 1 && counter === 0)
       Schedule.stop()
   }
-
-  scriptEnd = now()
-  styleStart = frameStart
-  rAF(frame)
 }
 
 function now() {
   return performance.now() || Date.now()
 }
 Schedule.stop = function() {
-  console.log('stop');
-  limit = balance
   accelerate = 1 // for slow start
   multiplier = 2
   isRunning = false
 }
-Schedule.start = function () {
-  scriptStart = 0
-  scriptEnd = 0
-  styleStart = 0
-  styleEnd = 0
+Schedule.start = function() {
+  scriptStart = null
+  scriptEnd = null
+  styleStart = null
+  styleEnd = null
   isRunning = true
   rAF(frame)
+
 }
 Schedule.put = function(priority, callback, times) {
   if (!times) {
     queue[priority].push(callback)
     counter ++
-  }
-  else {
+  } else {
     while (times--)  {
       queue[priority].push(callback)
       counter ++

@@ -30,9 +30,9 @@
 
   var level = 0
 
-  while(level ++ < 20) {
+  while(level ++ < 50) {
     add(level)
-    Schedule.once(20, function() {
+    Schedule.once(50, function() {
       Schedule.stop()
     })
   }

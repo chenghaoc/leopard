@@ -1,25 +1,27 @@
-import Schedule from './schedule'
+import Leopard from './Leopard'
 
-Schedule.put(1, function () {
+Leopard.put(1, function () {
   
 })
-Schedule.put(2, function () {
+Leopard.put(2, function () {
   
 })
-Schedule.put(3, function () {
+Leopard.put(3, function () {
 
 
-Schedule.start()
-Schedule.pause()
-Schedule.resume()
+Leopard.start()
+Leopard.stop()
 // Event
-Schedule.on(1, function() {})
+Leopard.on(1, function() {})
 
 // 
-Schedule.heavy('js')
-Schedule.heavy('style')
+Leopard.heavy('js')
+Leopard.heavy('style')
 
-Schedule.put(1, function () {
+//
+Leopard.limit(10)
+
+Leopard.put(1, function () {
   var a = document.createElement('div')
   //
   //
