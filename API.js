@@ -11,14 +11,15 @@ Leopard.put(3, function () {
 
 Leopard.start()
 Leopard.stop()
+
 // Event
 Leopard.on(1, function() {})
+Leopard.on(id, function() {})
+Leopard.once(1, function() {})
 
-// 
+// Tuning
 Leopard.heavy('js')
 Leopard.heavy('style')
-
-//
 Leopard.limit(10)
 
 Leopard.put(1, function () {

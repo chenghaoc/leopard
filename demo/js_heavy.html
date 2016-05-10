@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title></title>
+</head>
+<body>
+<div style="position: fixed;right: 0;" id='state'></div>
+<button id='add'>add</button>
+<button id='button'>run</button>
+
+<script src='../build/leopard.min.js'></script>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/stats.js/r16/Stats.min.js'></script>
+<script>
+  var stats = new Stats();
+  stats.showPanel( 0 ); // 0: fps, 1: ms, 2: mb, 3+: custom
+  console.log(stats);
+  document.querySelector('#state').appendChild( stats.domElement );
+  function animate() {
+      stats.begin();
+      // monitored code goes here
+      stats.end();
+      requestAnimationFrame( animate );
+  }
+  requestAnimationFrame( animate );
+
+  var actions = []
+  Leopard.start()
+
+
+  var level = 0
+
+  while(level ++ < 10) {
+    add(level)
+  }
+  function add(l) {
+    console.log('add');
+      actions.push(function() {
+        Leopard.put(l, function () {
+          var i = 1000000
+          var accumulate = 0
+          while (i --) {
+            accumulate += i
+          }
+        })
+      })
+    }
+  document.querySelector('#add').addEventListener('click', function(e) {
+    add(level++)
+  });
+  document.querySelector('#button').addEventListener('click', function(e) {
+    setInterval(function() {
+      actions.forEach(action => action())
+    }, 16)
+  });
+
+</script>
+</body>
+</html>
