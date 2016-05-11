@@ -2,34 +2,39 @@
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
 
-// http://paulirish.com/2011/requestanimationframe-for-smart-animating/
-// http://my.opera.com/emoller/blog/2011/12/20/requestanimationframe-for-smart-er-animating
+// @license http://opensource.org/licenses/MIT
+// copyright Paul Irish 2015
 
-// requestAnimationFrame polyfill by Erik Möller. fixes from Paul Irish and Tino Zijdel
+// Date.now() is supported everywhere except IE8. For IE8 we use the Date.now polyfill
+//   github.com/Financial-Times/polyfill-service/blob/master/polyfills/Date.now/polyfill.js
+// as Safari 6 doesn't have support for NavigationTiming, we use a Date.now() timestamp for relative values
 
-// MIT license
+// if you want values similar to what you'd get with real perf.now, place this towards the head of the page
+// but in reality, you're just getting the delta between now() calls, so it's not terribly important where it's placed
 
 (function () {
-  var lastTime = 0;
-  var vendors = ['ms', 'moz', 'webkit', 'o'];
-  for (var x = 0; x < vendors.length && !window.requestAnimationFrame; ++x) {
-    window.requestAnimationFrame = window[vendors[x] + 'RequestAnimationFrame'];
-    window.cancelAnimationFrame = window[vendors[x] + 'CancelAnimationFrame'] || window[vendors[x] + 'CancelRequestAnimationFrame'];
+
+  if ('performance' in window == false) {
+    window.performance = {};
   }
 
-  if (!window.requestAnimationFrame) window.requestAnimationFrame = function (callback, element) {
-    var currTime = new Date().getTime();
-    var timeToCall = Math.max(0, 16 - (currTime - lastTime));
-    var id = window.setTimeout(function () {
-      callback(currTime + timeToCall);
-    }, timeToCall);
-    lastTime = currTime + timeToCall;
-    return id;
+  Date.now = Date.now || function () {
+    // thanks IE8
+    return new Date().getTime();
   };
 
-  if (!window.cancelAnimationFrame) window.cancelAnimationFrame = function (id) {
-    clearTimeout(id);
-  };
+  if ('now' in window.performance == false) {
+
+    var nowOffset = Date.now();
+
+    if (performance.timing && performance.timing.navigationStart) {
+      nowOffset = performance.timing.navigationStart;
+    }
+
+    window.performance.now = function now() {
+      return Date.now() - nowOffset;
+    };
+  }
 })();
 
 var Emitter = function Emitter() {
@@ -111,9 +116,12 @@ function enqueue(priority, callback, times) {
 }
 
 var perFrame = 16;
+
+var expectedFrame = perFrame;
 var limit = 10;
-var balance = limit;
-var goal = perFrame;
+var focus = 'smooth';
+
+// var balance = options.limit
 var isRunning = false;
 var accelerate = 1; // for slow start
 
@@ -125,31 +133,48 @@ var styleEnd;
 var styleDuration;
 var scriptDuration;
 
+var c = 1;
+var sum = 0;
 function frame(frameStart) {
   if (!isRunning) return;
 
   // calculate metrix
   styleEnd = frameStart;
-  styleDuration = styleStart ? styleEnd - styleStart : goal;
+  styleDuration = styleStart ? styleEnd - styleStart : expectedFrame;
   scriptDuration = scriptEnd - scriptStart;
-  scriptStart = now();
-  // console.log(limit)
-  // console.log(styleDuration);
 
+  var inc = true;
+  var dec = true;
+  // console.log(scriptDuration);
+  sum += limit;
+  c++;
+  console.log(styleDuration);
   // calculate limit
-  if (goal <= styleDuration && styleDuration < goal + 1 && styleDuration !== 0) {
+  if (focus === 'script') {
+    inc = scriptDuration < expectedFrame + 1;
+    dec = scriptDuration >= expectedFrame + 1;
+  } else if (focus === 'style') {
+    inc = true;
+    dec = false;
+  } else {
+    inc = styleDuration >= expectedFrame && styleDuration < expectedFrame + 1 && styleDuration !== 0;
+    dec = styleDuration >= expectedFrame + 1;
+  }
+
+  if (inc) {
     accelerate = accelerate * 2;
     limit += accelerate;
-  } else if (styleDuration >= goal + 1) {
+  } else if (dec) {
     accelerate = 1;
     limit = Math.floor(limit / 2);
   } else if (styleDuration === 0) {
     // This is a skipped frame
   }
   if (limit < 1) limit = 1;
+  scriptStart = performance.now();
   if (!run(limit)) // stop {
     stop();
-  scriptEnd = now();
+  scriptEnd = performance.now();
   styleStart = frameStart;
 
   requestAnimationFrame(frame);
@@ -164,26 +189,59 @@ function frame(frameStart) {
   }
 }
 
-function now() {
-  return performance.now() || Date.now();
-}
-
 function stop() {
   accelerate = 1; // for slow start
   isRunning = false;
 }
 function start() {
+  var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+
+  if (isRunning) return;
+  options.limit && (limit = options.limit);
+  options.expectedFrame && (expectedFrame = options.expectedFrame);
+  options.focus && (focus = options.focus);
   scriptStart = null;
   scriptEnd = null;
   styleStart = null;
   styleEnd = null;
   isRunning = true;
-  requestAnimationFrame(frame);
+
+  return requestAnimationFrame(frame);
 }
 function put(priority, callback, times) {
   enqueue(priority, callback, times);
   if (!isRunning) start();
 }
+
+// http://paulirish.com/2011/requestanimationframe-for-smart-animating/
+// http://my.opera.com/emoller/blog/2011/12/20/requestanimationframe-for-smart-er-animating
+
+// requestAnimationFrame polyfill by Erik Möller. fixes from Paul Irish and Tino Zijdel
+
+// MIT license
+
+(function () {
+  var lastTime = 0;
+  var vendors = ['ms', 'moz', 'webkit', 'o'];
+  for (var x = 0; x < vendors.length && !window.requestAnimationFrame; ++x) {
+    window.requestAnimationFrame = window[vendors[x] + 'RequestAnimationFrame'];
+    window.cancelAnimationFrame = window[vendors[x] + 'CancelAnimationFrame'] || window[vendors[x] + 'CancelRequestAnimationFrame'];
+  }
+
+  if (!window.requestAnimationFrame) window.requestAnimationFrame = function (callback, element) {
+    var currTime = new Date().getTime();
+    var timeToCall = Math.max(0, 16 - (currTime - lastTime));
+    var id = window.setTimeout(function () {
+      callback(currTime + timeToCall);
+    }, timeToCall);
+    lastTime = currTime + timeToCall;
+    return id;
+  };
+
+  if (!window.cancelAnimationFrame) window.cancelAnimationFrame = function (id) {
+    clearTimeout(id);
+  };
+})();
 
 var Leopard = {
   on: singletonEmitter.on.bind(singletonEmitter),

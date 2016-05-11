@@ -29,14 +29,13 @@
 
   var level = 0
 
-  while(level ++ < 10) {
+  while(level ++ < 30) {
     add(level)
   }
   function add(l) {
-    console.log('add');
       actions.push(function() {
         Leopard.put(l, function () {
-          var i = 1000000
+          var i = 3000000
           var accumulate = 0
           while (i --) {
             accumulate += i

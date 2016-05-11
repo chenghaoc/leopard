@@ -1,81 +1,41 @@
-import { run, enqueue } from './control'
-var perFrame = 16
-var limit = 10
-var balance = limit
-var goal = perFrame
-var isRunning = false
-var accelerate = 1 // for slow start
+import emitter from './emitter'
+var queue = []
+var counter = 0
+var levels = 1000
 
-var scriptStart
-var scriptEnd
-var styleStart
-var styleEnd
+for (let i = 0; i < levels; i ++) queue.push([])
 
-var styleDuration
-var scriptDuration
-
-
-function frame(frameStart) {
-  if (!isRunning) return
-
-  // calculate metrix
-  styleEnd = frameStart
-  styleDuration = styleStart ? (styleEnd - styleStart) : goal
-  scriptDuration = scriptEnd - scriptStart
-  scriptStart = now()
-  // console.log(limit)
-  // console.log(styleDuration);
-
-  // calculate limit
-  if (goal <= styleDuration && styleDuration < goal + 1 &&
-      styleDuration !== 0) {
-    accelerate = accelerate * 2
-    limit += accelerate
-  } else if (styleDuration >= goal + 1) {
-    accelerate = 1
-    limit = Math.floor(limit / 2)
-  } else if (styleDuration === 0) {
-    // This is a skipped frame
-  }
-  if (limit < 1)
-    limit = 1
-  if (!run(limit)) // stop {
-    stop()
-  scriptEnd = now()
-  styleStart = frameStart
-  
-  requestAnimationFrame(frame)
-  if (window && window.requestIdleCallback) {
-    // For browsers which support requestIdleCallback
-    requestIdleCallback(function(deadline) {
-      if (deadline.timeRemaining() > 0) {
-        var ratio = deadline.timeRemaining() / perFrame
-        run(Math.floor(limit * ratio))
+export function run(count) {
+  for (var i = 0; i < queue.length; i ++) {
+    if (count < 1) break
+    var level = queue[i]
+    while (level.length) {
+      if (count < 1) break
+      counter --
+      // the bigger of level, the less emergent to complete
+      // So we deduce more for higher level (lower priority) actions
+      count = count - i * i
+      var callback = level.shift()
+      if (callback && typeof callback === 'function') callback()
+      if (!level.length) {
+        emitter.emit(i)
       }
-    })
+    }
+    if (i === queue.length - 1 && counter === 0) {
+      return false
+    }
   }
+  return true
 }
-
-
-function now() {
-  return performance.now() || Date.now()
-}
-
-export function stop() {
-  accelerate = 1 // for slow start
-  isRunning = false
-}
-export function start() {
-  scriptStart = null
-  scriptEnd = null
-  styleStart = null
-  styleEnd = null
-  isRunning = true
-  requestAnimationFrame(frame)
-
-}
-export function put(priority, callback, times) {
-  enqueue(priority, callback, times)
-  if (!isRunning)
-    start()
+export function enqueue(priority, callback, times) {
+  if (!times) {
+    queue[priority].push(callback)
+    counter ++
+  } else {
+    while (times--)  {
+      queue[priority].push(callback)
+      counter ++
+    }
+  }
+  
 }

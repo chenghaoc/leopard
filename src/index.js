@@ -1,10 +1,12 @@
-import _ from './rAF'
+import now from './now'
 import {
   start,
   stop,
   put
-} from './schedule'
+} from './congestion'
 import emitter from './emitter'
+import rAF from './rAF'
+
 var Leopard = {
   on: emitter.on.bind(emitter),
   once: emitter.once.bind(emitter),
