@@ -1,5 +1,5 @@
 {
-  "name": "leopard",
+  "name": "leopard.js",
   "version": "0.0.1",
   "description": "60 fps pages made easy.",
   "main": "build/leopard.js",

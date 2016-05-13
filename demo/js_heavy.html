@@ -5,27 +5,62 @@
 </head>
 <body>
 <div style="position: fixed;right: 0;" id='state'></div>
-<button id='add'>add</button>
-<button id='button'>run</button>
+
+<div>
+  <input id='script' type='checkbox' checked onchange="change('script')">Script heavy</input>
+  <input id='style' type='checkbox' onchange="change('style')">Style heavy</input>
+</div>
+<div>
+  <label>Performance:</label>
+  <input value='2' oninput="change(this.value)"></input>
+</div>
+<div>
+  <button id='add'>add</button>
+  <button id='button'>run</button>
+</div>
 
 <script src='../build/leopard.min.js'></script>
 <script src='https://cdnjs.cloudflare.com/ajax/libs/stats.js/r16/Stats.min.js'></script>
 <script>
   var stats = new Stats();
-  stats.showPanel( 0 ); // 0: fps, 1: ms, 2: mb, 3+: custom
+  var xPanel = stats.addPanel( new Stats.Panel( 'avg. count', '#ff8', '#221' ) );
+  stats.showPanel( 3 );
   console.log(stats);
   document.querySelector('#state').appendChild( stats.domElement );
+
+  var c = 1
+  var sum = 0
   function animate() {
       stats.begin();
       // monitored code goes here
       stats.end();
+      sum += Leopard.limit
+      c ++
+      xPanel.update( sum / c, 1000000 );
       requestAnimationFrame( animate );
   }
   requestAnimationFrame( animate );
 
   var actions = []
-  Leopard.start()
+  var options = {
+    strategy: 'style',
+    perf: 2
+  }
+  Leopard.start(options)
 
+  function change(value) {
+    if (value === 'style') {
+      options.strategy = value
+      document.getElementById('script').checked = false
+    }
+    else if (value === 'script') {
+      options.strategy = value
+      document.getElementById('style').checked = false
+    }
+    else if (value.length > 0 && !isNaN(value))
+      options.perf = value
+    Leopard.start(options)
+  }
 
   var level = 0
 

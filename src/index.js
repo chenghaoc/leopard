@@ -2,7 +2,8 @@ import now from './now'
 import {
   start,
   stop,
-  put
+  put,
+  l
 } from './congestion'
 import emitter from './emitter'
 import rAF from './rAF'
@@ -12,7 +13,10 @@ var Leopard = {
   once: emitter.once.bind(emitter),
   start,
   stop,
-  put
+  put,
+  get limit() {
+    return l()
+  }
 }
 
 if (typeof exports === 'object')

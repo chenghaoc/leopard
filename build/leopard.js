@@ -118,8 +118,9 @@ function enqueue(priority, callback, times) {
 var perFrame = 16;
 
 var expectedFrame = perFrame;
-var limit = 10;
-var focus = 'smooth';
+var limit = 1000;
+var strategy = 'style';
+var perf = 2;
 
 // var balance = options.limit
 var isRunning = false;
@@ -133,8 +134,6 @@ var styleEnd;
 var styleDuration;
 var scriptDuration;
 
-var c = 1;
-var sum = 0;
 function frame(frameStart) {
   if (!isRunning) return;
 
@@ -146,23 +145,19 @@ function frame(frameStart) {
   var inc = true;
   var dec = true;
   // console.log(scriptDuration);
-  sum += limit;
-  c++;
-  console.log(styleDuration);
+
   // calculate limit
-  if (focus === 'script') {
+  if (focus === 'style') {
+    // will try to batch up all update
     inc = scriptDuration < expectedFrame + 1;
     dec = scriptDuration >= expectedFrame + 1;
-  } else if (focus === 'style') {
-    inc = true;
-    dec = false;
   } else {
     inc = styleDuration >= expectedFrame && styleDuration < expectedFrame + 1 && styleDuration !== 0;
     dec = styleDuration >= expectedFrame + 1;
   }
 
   if (inc) {
-    accelerate = accelerate * 2;
+    accelerate = accelerate * perf;
     limit += accelerate;
   } else if (dec) {
     accelerate = 1;
@@ -190,27 +185,30 @@ function frame(frameStart) {
 }
 
 function stop() {
+  console.log('stop');
   accelerate = 1; // for slow start
   isRunning = false;
 }
 function start() {
   var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 
-  if (isRunning) return;
+  if (!isRunning) requestAnimationFrame(frame);
   options.limit && (limit = options.limit);
   options.expectedFrame && (expectedFrame = options.expectedFrame);
-  options.focus && (focus = options.focus);
+  options.strategy && (strategy = options.strategy);
+  options.perf && (perf = options.perf);
   scriptStart = null;
   scriptEnd = null;
   styleStart = null;
   styleEnd = null;
   isRunning = true;
-
-  return requestAnimationFrame(frame);
 }
 function put(priority, callback, times) {
   enqueue(priority, callback, times);
   if (!isRunning) start();
+}
+function l() {
+  return limit;
 }
 
 // http://paulirish.com/2011/requestanimationframe-for-smart-animating/
@@ -248,7 +246,10 @@ var Leopard = {
   once: singletonEmitter.once.bind(singletonEmitter),
   start: start,
   stop: stop,
-  put: put
+  put: put,
+  get limit() {
+    return l();
+  }
 };
 
 if ((typeof exports === 'undefined' ? 'undefined' : _typeof(exports)) === 'object') module.exports = Leopard;else if (typeof define === 'function' && typeof define.amd !== 'undefined') define(function () {

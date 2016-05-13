@@ -5,25 +5,62 @@
 </head>
 <body>
 <div style="position: fixed;right: 0;" id='state'></div>
-<button id='add'>add</button>
-<button id='button'>run</button>
+
+<div>
+  <input id='script' type='checkbox' checked onchange="change('script')">Script heavy</input>
+  <input id='style' type='checkbox' onchange="change('style')">Style heavy</input>
+</div>
+<div>
+  <label>Performance:</label>
+  <input value='2' oninput="change(this.value)"></input>
+</div>
+<div>
+  <button id='add'>add</button>
+  <button id='button'>run</button>
+</div>
+
 <script src='../build/leopard.min.js'></script>
 <script src='https://cdnjs.cloudflare.com/ajax/libs/stats.js/r16/Stats.min.js'></script>
 <script>
   var stats = new Stats();
-  stats.showPanel( 0 ); // 0: fps, 1: ms, 2: mb, 3+: custom
+  var xPanel = stats.addPanel( new Stats.Panel( 'avg. count', '#ff8', '#221' ) );
+  stats.showPanel( 3 );
   console.log(stats);
   document.querySelector('#state').appendChild( stats.domElement );
+
+  var c = 1
+  var sum = 0
   function animate() {
       stats.begin();
       // monitored code goes here
       stats.end();
+      sum += Leopard.limit
+      c ++
+      xPanel.update( sum / c, 1000000 );
       requestAnimationFrame( animate );
   }
   requestAnimationFrame( animate );
 
   var actions = []
-  Leopard.start()
+  var options = {
+    strategy: 'style',
+    perf: 2
+  }
+  Leopard.start(options)
+
+  function change(value) {
+    if (value === 'style') {
+      options.strategy = value
+      document.getElementById('script').checked = false
+    }
+    else if (value === 'script') {
+      options.strategy = value
+      document.getElementById('style').checked = false
+    }
+    else if (value.length > 0 && !isNaN(value))
+      options.perf = value
+    Leopard.start(options)
+  }
 
   var level = 0
   while(level ++ < 50)
@@ -33,7 +70,8 @@
       var bag = []
       var container = document.createElement('div');
       document.body.appendChild(container)
-      Leopard.put(l, function () {
+      var times = 50
+      while (times --) {
         var div = document.createElement('div')
         div.style.width = Math.random() * 20 + 'px'
         div.style.height = '10px'
@@ -42,7 +80,7 @@
         div.style.display = 'inline-block'
         container.appendChild(div)
         bag.push(div)
-      }, 50)
+      }
       actions.push(function() {
         bag.filter(function() {
           return Math.random() > 0.5
@@ -62,29 +100,6 @@
       actions.forEach(action => action())
     }, 30)
   });
-
-  // Leopard.put(1, function () {
-  //   var div = document.createElement('div')
-  //   div.style.width = Math.random() * 20 + 'px'
-  //   div.style.height = '100px'
-  //   div.style['background-color'] =
-  //     `#${Math.floor(Math.random() * 10)}${Math.floor(Math.random() * 10)}${Math.floor(Math.random() * 10)}`
-  //   div.style.display = 'inline-block'
-  //   document.querySelector('#container2').appendChild(div)
-  //   bag2.push(div)
-  // }, 50)
-
-  
-
-  // document.querySelector('#start2').addEventListener('click', function(e) {
-  //   bag2.filter(function() {
-  //     return Math.random() > 0.5
-  //   }).forEach(function(item) {
-  //     Leopard.put(1, function () {
-  //       document.querySelector('#container2').appendChild(item)
-  //     })
-  //   })
-  // })
 </script>
 </body>
 </html>
