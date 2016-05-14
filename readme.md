@@ -1,5 +1,14 @@
 # Leopard
 
+<a href='https://travis-ci.org/changbenny/leopard'>
+  <img src='https://img.shields.io/travis/changbenny/leopard.svg'>
+</a>
+<a href='https://coveralls.io/github/changbenny/leopard?branch=master'>
+  <img src='https://img.shields.io/coveralls/changbenny/leopard.svg'>
+</a>
+<img src='https://img.shields.io/npm/v/leopard.svg'>
+<img src='https://img.shields.io/npm/l/leopard.svg?maxAge=2592000'>
+
 60 fps pages made easy.
 
 Leopard is a performant, heuristic scheduler for building user interface.
