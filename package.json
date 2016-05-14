@@ -1,6 +1,6 @@
 {
   "name": "leopard.js",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "60 fps pages made easy.",
   "main": "build/leopard.js",
   "devDependencies": {
@@ -34,8 +34,13 @@
     "watchify": "^3.7.0"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "nyc ava --serial test/*.js"
   },
-  "author": "",
+  "ava": {
+    "require": [
+      "./test/helpers/browser-env.js"
+    ]
+  },
+  "author": "changbenny",
   "license": "MIT"
 }

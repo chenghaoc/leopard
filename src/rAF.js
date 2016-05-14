@@ -5,7 +5,7 @@
 
 // MIT license
 
-(function() {
+;(function() {
   var lastTime = 0
   var vendors = ['ms', 'moz', 'webkit', 'o']
   for (var x = 0; x < vendors.length && !window.requestAnimationFrame; ++x) {
@@ -23,7 +23,7 @@
           lastTime = currTime + timeToCall
           return id
         }
-
+  /* istanbul ignore if */
   if (!window.cancelAnimationFrame)
         window.cancelAnimationFrame = function(id) {
           clearTimeout(id)

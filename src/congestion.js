@@ -1,9 +1,13 @@
-import { run, enqueue } from './schedule'
+import _ from './rAF'
+import __ from './now'
+import { run, enqueue, flush } from './schedule'
+
 
 const perFrame = 16
 
 var expectedFrame = perFrame
 var limit = 1000
+var count = limit
 var strategy = 'style'
 var perf = 2
 
@@ -21,7 +25,6 @@ var scriptDuration
 
 function frame(frameStart) {
   if (!isRunning) return
-
   // calculate metrix
   styleEnd = frameStart
   styleDuration = styleStart ? (styleEnd - styleStart) : expectedFrame
@@ -29,10 +32,8 @@ function frame(frameStart) {
 
   var inc = true
   var dec = true
-  // console.log(scriptDuration);
-  
   // calculate limit
-  if (focus === 'style') {
+  if (strategy === 'style') {
     // will try to batch up all update
     inc =
       (scriptDuration < expectedFrame + 1)
@@ -46,45 +47,47 @@ function frame(frameStart) {
     dec =
       (styleDuration >= expectedFrame + 1)
   }
-
   if (inc) {
     accelerate = accelerate * perf
-    limit += accelerate
+    count += accelerate
   } else if (dec) {
     accelerate = 1
-    limit = Math.floor(limit / 2)
+    count = Math.floor(count / 2)
+    /* istanbul ignore next */
   } else if (styleDuration === 0) {
     // This is a skipped frame
   }
-  if (limit < 1)
-    limit = 1
-  scriptStart = performance.now()
-  if (!run(limit)) // stop {
+  if (count < 1)
+    count = 1
+  scriptStart = window.performance.now()
+  if (!run(count)) // stop {
     stop()
-  scriptEnd = performance.now()
+  scriptEnd = window.performance.now()
   styleStart = frameStart
 
-  requestAnimationFrame(frame)
+  window.requestAnimationFrame(frame)
   if (window && window.requestIdleCallback) {
     // For browsers which support requestIdleCallback
-    requestIdleCallback(function(deadline) {
+    /* istanbul ignore next */
+    window.requestIdleCallback(function(deadline) {
       if (deadline.timeRemaining() > 0) {
         var ratio = deadline.timeRemaining() / perFrame
-        run(Math.floor(limit * ratio))
+        run(Math.floor(count * ratio))
       }
     })
   }
 }
 
 export function stop() {
-  console.log('stop');
   accelerate = 1 // for slow start
+  count = limit
   isRunning = false
+  flush()
 }
 export function start(options = {}) {
   if (!isRunning)
-    requestAnimationFrame(frame)
-  options.limit && (limit = options.limit)
+    window.requestAnimationFrame(frame)
+  options.limit && (limit = count = options.limit)
   options.expectedFrame && (expectedFrame = options.expectedFrame)
   options.strategy && (strategy = options.strategy)
   options.perf && (perf = options.perf)
@@ -96,9 +99,7 @@ export function start(options = {}) {
 }
 export function put(priority, callback, times) {
   enqueue(priority, callback, times)
-  if (!isRunning)
-    start()
 }
-export function l() {
-  return limit
+export function getCount() {
+  return count
 }

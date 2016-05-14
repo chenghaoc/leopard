@@ -1,12 +1,12 @@
-import now from './now'
+import emitter from './emitter'
+
 import {
   start,
   stop,
   put,
-  l
+  getCount
 } from './congestion'
-import emitter from './emitter'
-import rAF from './rAF'
+
 
 var Leopard = {
   on: emitter.on.bind(emitter),
@@ -15,7 +15,7 @@ var Leopard = {
   stop,
   put,
   get limit() {
-    return l()
+    return getCount()
   }
 }
 

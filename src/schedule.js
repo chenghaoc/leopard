@@ -1,4 +1,5 @@
 import emitter from './emitter'
+
 var queue = []
 var counter = 0
 var levels = 1000
@@ -21,6 +22,7 @@ export function run(count) {
         emitter.emit(i)
       }
     }
+    /* istanbul ignore if */
     if (i === queue.length - 1 && counter === 0) {
       return false
     }
@@ -37,5 +39,8 @@ export function enqueue(priority, callback, times) {
       counter ++
     }
   }
-  
+}
+export function flush() {
+  for (let i = 0; i < levels; i ++) queue[i].length = 0
+  counter = 0
 }

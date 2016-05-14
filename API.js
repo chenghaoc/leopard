@@ -19,7 +19,7 @@ Leopard.once(1, function() {})
 
 // Tuning
 Leopard.strategy('style')
-Leopard.perf(2)
+Leopard.perf(22)
 
 Leopard.put(1, function () {
   var a = document.createElement('div')

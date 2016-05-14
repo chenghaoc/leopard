@@ -1,7 +1,6 @@
 var Emitter = function() {
   this.uid = 0
   this.handlers = []
-  // FIX 1000
   for (let i = 0; i < 1000; i ++) this.handlers.push([])
 }
 Emitter.prototype.on = function(level, callback) {

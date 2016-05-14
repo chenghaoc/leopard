@@ -96,9 +96,11 @@
     add(level++)
   });
   document.querySelector('#button').addEventListener('click', function(e) {
+    actions.forEach(action => action())
     setInterval(function() {
       actions.forEach(action => action())
-    }, 30)
+    }, 16)
+    Leopard.start()
   });
 </script>
 </body>
