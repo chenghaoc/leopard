@@ -155,7 +155,7 @@ var perFrame = 16;
 var expectedFrame = perFrame;
 var limit = 1000;
 var count = limit;
-var strategy = 'style';
+var strategy = 'normal';
 var perf = 2;
 
 // var balance = options.limit
@@ -180,7 +180,7 @@ function frame(frameStart) {
   var inc = true;
   var dec = true;
   // calculate limit
-  if (strategy === 'style') {
+  if (strategy === 'batch') {
     // will try to batch up all update
     inc = scriptDuration < expectedFrame + 1;
     dec = scriptDuration >= expectedFrame + 1;
@@ -219,6 +219,7 @@ function frame(frameStart) {
 }
 
 function stop() {
+  console.log('stop');
   accelerate = 1; // for slow start
   count = limit;
   isRunning = false;
