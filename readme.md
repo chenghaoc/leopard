@@ -6,8 +6,8 @@
 <a href='https://coveralls.io/github/changbenny/leopard?branch=master'>
   <img src='https://img.shields.io/coveralls/changbenny/leopard.svg'>
 </a>
-<img src='https://img.shields.io/npm/v/leopard.svg'>
-<img src='https://img.shields.io/npm/l/leopard.svg?maxAge=2592000'>
+<img src='https://img.shields.io/npm/v/leopard.js.svg'>
+<img src='https://img.shields.io/npm/l/leopard.js.svg?maxAge=2592000'>
 
 60 fps pages made easy.
 
