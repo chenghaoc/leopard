@@ -9,12 +9,12 @@
 <img src='https://img.shields.io/npm/v/leopard.js.svg'>
 <img src='https://img.shields.io/npm/l/leopard.js.svg?maxAge=2592000'>
 
-> 60 fps pages made easy.
+> 60 FPS pages made easy.
 >
 
 Performant, heuristic scheduler for building user interface (Just 4 kb gzipped).
 
-Leopard eliminat janky experiences by scheduling DOM related operation automatically. For page with heavy DOM manipulation, Leopard will batch update related manipulation. For page with heavy JavaScript calculation, Leopard will delay the calculation for avoiding janky experience.
+Leopard eliminate any jank from websites by scheduling page interactions automatically. For pages with heavy DOM manipulation, Leopard will batch update related manipulation. For pages with heavy JavaScript calculation, Leopard will delay the calculation for avoiding jank. #perfmatters
 
 ## Examples
 
@@ -25,48 +25,43 @@ Leopard eliminat janky experiences by scheduling DOM related operation automatic
 #### Schedule user actions with high priority
 
 ```javascript
-let level = 50
-while (level --) {
-  Leopard.put(level, function () {
-    // DOM manipulation
+target.addEventListener('click', function(e) {
+  Leopard.put(1, function() {
+    // feedback of user actions
   })
-}
+})
+Leopard.put(10, function() {
+  // sync the data, upload analysis data, etc.
+})
 Leopard.start()
 ```
 
-#### Listen on specific level completeness.
+#### Listen events
 
 ```javascript
 Leopard.put(2, function() {
-  console.log('level 2: task')
+  console.log('priority 2: task')
 })
 Leopard.put(1, function() {
-  console.log('level 1: first task')
+  console.log('priority 1: first task')
 })
 Leopard.put(1, function() {
-  console.log('level 1: second task')
+  console.log('priority 1: second task')
 })
 Leopard.on(1, function () {
-  console.log('level 1: complete')
+  console.log('priority 1: complete')
 })
+Leopard.start()
+
 ```
 
 Output:
 
 ```javascript
-level 1: first task
-level 1: second task
-level 1: complete
-level 2: task
-```
-
-#### Doing background data analysis.
-
-```javascript
-target.addEventListener('click', function(e) {
-  Leopard.put(1, doAnimation)
-})
-Leopard.put(10, syncData)
+priority 1: first task
+priority 1: second task
+priority 1: complete
+priority 2: task
 ```
 
 
@@ -81,40 +76,44 @@ npm install leopard.js
 
 ## API
 
-#### `Leopard.put(level, callback)`
+#### `Leopard.put(priority, callback)`
 
-`level` Integer between 0 to 1000, lower level, higher priority.
+`priority` Integer between 0 to 1000, lower value, higher priority.
 
-Enqueue a task to the Scheduler.
+Enqueue a task with specific priority to the Scheduler.
 
-#### `Leopard.start(options)`
+#### `Leopard.start([options])`
 
 Start Leopard, the [options](#options) is for optional advanced setting.
 
 #### `Leopard.stop()`
 
-Stop Leopard.
+Stop Leopard and flush the unfinished tasks in the scheduler queue.
 
 ### Events
 
-#### `Leopard.on(level, callback)`
+When all tasks in one priority queue finish, Leopard will fire an event. Your can listen to the specific priority queue.
 
-#### `Leopard.once(level, callback)`
+#### `Leopard.on(priority, callback)`
+
+#### `Leopard.once(priority, callback)`
 
 ### Options
 
 | Name     | Type    | Usage                                    | Default  |
 | -------- | ------- | ---------------------------------------- | -------- |
-| limit    | Integer | The limit of actions can be executed per frame. Leopard will adjust this value based on browser performance. | 1000     |
-| strategy | String  | The batching strategy. For pages with heavy DOM manipulation (means lots of page re-layout, re-paint), you should set the value to `batch`, Leopard will batch update. For pages with heavy Calculation with JavaScript, set the option to `normal`, Leopard will schedule those operation for avoiding janky experience. | 'normal' |
+| limit    | Integer | The limit of actions can be executed per frame. Leopard will adjust this value based on the browser performance. If each actions in scheduler queue costs many resources, then decrease this option. | 1000     |
+| strategy | String  | The batching strategy. For pages with heavy DOM manipulation (a lot of page re-layout, re-paint), you should set the option to `batch`. Leopard will batch update and avoid too many page re-paint. Otherwise, keep this option as `normal`, Leopard will schedule those operation for avoiding jank. | 'normal' |
 | perf     | Float   | Tune the performance. Bigger the number, better perfmance , but lower FPS. | 2.0      |
 | autoStop | Boolean | automatically stop if there's no tasks in scheduler queue. | false    |
 
 ## Concept
 
-The algorithm that calculating maximun callback each frames can execute is inspired by TCP congestion control.
+The algorithm for calculating maximum actions per frames is inspired by *TCP congestion control*. 
 
-The scheduler for scheduling the prioritised process is based on *Fixed priority none-preemptive scheduling*. You can specify the pripority of tasks by yourself, but be careful about the tasks number you assign to scheduler, too many tasks will cause [starvation](https://en.wikipedia.org/wiki/Starvation_(computer_science)).
+The scheduler for scheduling the prioritised actions is based on *Fixed priority none-preemptive scheduling*. You specify the priority of tasks by yourself. Be careful about number of tasks you assign to the scheduler. Too many tasks in a scheduler queue will cause [Starvation](https://en.wikipedia.org/wiki/Starvation_(computer_science)).
+
+
 
 ## Browser Support
 
