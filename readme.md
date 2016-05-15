@@ -1,4 +1,4 @@
-# Leopard
+# [Leopard](http://changbenny.github.io/leopard/)
 
 <a href='https://travis-ci.org/changbenny/leopard'>
   <img src='https://img.shields.io/travis/changbenny/leopard.svg'>
@@ -10,11 +10,20 @@
 <img src='https://img.shields.io/npm/l/leopard.js.svg?maxAge=2592000'>
 
 > 60 FPS pages made easy.
->
 
 Performant, heuristic scheduler for building user interface (Just 4 kb gzipped).
 
-Leopard eliminate any jank from websites by scheduling page interactions automatically. For pages with heavy DOM manipulation, Leopard will batch update related manipulation. For pages with heavy JavaScript calculation, Leopard will delay the calculation for avoiding jank. #perfmatters
+[Leopard](http://changbenny.github.io/leopard/) eliminates jank from websites by scheduling page interactions automatically. For pages with heavy DOM manipulation, Leopard will batch update related manipulation. For pages with heavy JavaScript calculation, Leopard will schedule the calculation for avoiding jank.
+
+## Install
+
+```sh
+npm install leopard.js
+```
+
+```html
+<script src="build/leopard.min.js"></script>
+```
 
 ## Examples
 
@@ -66,14 +75,6 @@ priority 2: task
 
 
 
-## Installation
-
-```sh
-npm install leopard.js
-```
-
-
-
 ## API
 
 #### `Leopard.put(priority, callback)`
@@ -118,7 +119,7 @@ The scheduler for scheduling the prioritised actions is based on *Fixed priorit
 ## Browser Support
 
 | Chrome | Firefox | IE   | Safari |
-| ------ | ------- | ---- | ------ |
+| :----- | :------ | :--- | :----- |
 | latest | latest  | 9+   | latest |
 
 ## License
