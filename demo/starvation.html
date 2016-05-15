@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title></title>
+  <link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
+<style>
+html, body {
+  background: #eee;
+}
+body {
+  font-family: 'Roboto', sans-serif;
+  max-width: 800px;
+  margin: 0 auto;
+}
+.wrapper {
+  float: left;
+  margin-left: 25px;
+  text-align: center;
+}
+.panel {
+  margin-top: 10px;
+  margin-bottom: 10px;
+  padding: 10px;
+  background-color: #fff;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+}
+.shadow {
+  box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+}
+.notice {
+  margin-top: 10px;
+  margin-bottom: 10px;
+  color: #e74c3c;
+}
+#state {
+  float: right;
+}
+.clearfix {
+  overflow: auto;
+  zoom: 1;
+}
+</style>
+</head>
+
+<body>
+
+<div class='panel'>
+  <h1>Work in progress</h1>
+  <h3>Scheduling tasks with different priority</h3>
+  The example demonstrate that tasks with high priority (such as feedback of user action) will always execute smoothly, even there're many tasks in the scheduler. But tasks with low priority (such as data analysis) may face the situation of starvation (never execute) if there're always some tasks have some higher priority.
+</div>
+<div class='panel'>
+  <div>
+    <input id='mess' type='checkbox' onchange="change('mess')">Without Leopard</input>
+    <input id='normal' type='checkbox' checked onchange="change('normal')">Leopard normal strategy</input>
+    <input id='batch' type='checkbox' onchange="change('batch')">Leopard batch strategy</input>
+    <div class='notice'>Notice the fps when using and not using Leopard.</div>
+    <div class='clearfix'>
+      <div id='state'></div>
+    </div>
+  </div>
+  <div>
+    <!-- <label>Performance:</label>
+    <input id='perf' value='2' oninput="change(this.value)"></input> -->
+  </div>
+  <div>
+    <button class='btn' id='button'>Run</button>
+    <button class='btn' id='stop' disabled>Stop</button>
+  </div>
+</div>
+<div class='panel clearfix'>
+  <div class='wrapper'>
+    <h5>1~50</h5>
+    <div class='container' id='container1'></div>
+  </div>
+  
+</div>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/color-js/1.0.1/color.min.js'></script>
+<script src='../build/leopard.min.js'></script>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/stats.js/r16/Stats.min.js'></script>
+<script>
+  var stats = new Stats();
+  var xPanel = stats.addPanel( new Stats.Panel( 'avg. count', '#ff8', '#221' ) );
+  stats.showPanel( 0 );
+  document.querySelector('#state').appendChild( stats.domElement );
+  var container1 = document.getElementById('container1');
+  var container2 = document.getElementById('container2');
+  var container3 = document.getElementById('container3');
+  var c = 1
+  var sum = 0
+  var Color = net.brehaut.Color;
+  var white = Color("#e74c3c")
+  var blue = Color('#3498db')
+  var inter
+  function animate() {
+      stats.begin();
+      // monitored code goes here
+      stats.end();
+      sum += Leopard.limit
+      c ++
+      xPanel.update( Leopard.limit, 1000000 );
+      requestAnimationFrame( animate );
+  }
+  requestAnimationFrame( animate );
+
+  var actions = []
+  var normalActions = []
+  var options = {
+    strategy: 'normal',
+    perf: 2
+  }
+  // Leopard.start(options)
+  var mess = false
+  function change(value) {
+    mess = false
+    if (value === 'batch') {
+      options.strategy = value
+      document.getElementById('mess').checked = false
+      document.getElementById('normal').checked = false
+    }
+    else if (value === 'normal') {
+      options.strategy = value
+      document.getElementById('mess').checked = false
+      document.getElementById('batch').checked = false
+    }
+    else if (value === 'mess') {
+      mess = true
+      options.strategy = value
+      document.getElementById('normal').checked = false
+      document.getElementById('batch').checked = false
+      return
+    }
+    else if (value.length > 0 && !isNaN(value))
+      options.perf = value
+    Leopard.start(options)
+  }
+
+  var level = 0
+  while(level ++ < 5000)
+    add(Math.floor(level / 10))
+  
+  function add(l) {
+      var div = document.createElement('div')
+      var container = container1
+
+      div.style.width = '50px'
+      div.style.height = '1px'
+      div.style.opacity = '0'
+      div.style['background-color'] = 
+        white
+        .blend(blue, l / 250)
+        .toCSS()
+      container.appendChild(div)
+      // div.style.transform = 'translateX(' + Math.sin(l) * 1.5 + 'px)'
+      var item = {
+        distance: div.offsetTop,
+        div: div
+      }
+      actions.push(function(timestamp) {
+        Leopard.put(l, function () {
+          var div = item.div
+          var distance = item.distance
+          div.style.opacity = '1'
+          var left = ((Math.sin(distance + timestamp/1000)+1) * 300);
+          div.style.transform = 'translateX(' + left + 'px)'
+        })
+      })
+      normalActions.push(function(timestamp) {
+        var div = item.div
+        var distance = item.distance
+        div.style.opacity = '1'
+        var left = ((Math.sin(distance + timestamp/1000)+1) * 300);
+        div.style.transform = 'translateX(' + left + 'px)'
+      })
+    }
+  document.querySelector('#button').addEventListener('click', function(e) {
+    document.getElementById('mess').disabled = true
+    document.getElementById('normal').disabled = true
+    document.getElementById('batch').disabled = true
+    document.getElementById('button').disabled = true
+    document.getElementById('stop').disabled = false
+    function f(t) {
+        for (var i = 0; i < normalActions.length; i ++)
+          normalActions[i](t)
+      requestAnimationFrame(f)
+    }
+    if (mess) {
+      requestAnimationFrame(f)
+      return
+    }
+    var times = 300
+    requestAnimationFrame(function f(t) {
+        for (var i = 0; i < actions.length; i ++)
+          actions[i](t)
+      requestAnimationFrame(f)
+    })
+    Leopard.start()
+    
+  });
+  document.querySelector('#stop').addEventListener('click', function(e) {
+    Leopard.stop()
+    document.getElementById('mess').disabled = false
+    document.getElementById('normal').disabled = false
+    document.getElementById('batch').disabled = false
+    document.getElementById('button').disabled = false
+    document.getElementById('stop').disabled = true
+    // clearInterval(inter)
+    inter = null
+  });
+</script>
+</body>
+</html>

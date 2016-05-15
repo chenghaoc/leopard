@@ -119,7 +119,7 @@ for (var i = 0; i < levels; i++) {
       counter--;
       // the bigger of level, the less emergent to complete
       // So we deduce more for higher level (lower priority) actions
-      count = count - i * i;
+      count--;
       var callback = level.shift();
       if (callback && typeof callback === 'function') callback();
       if (!level.length) {
@@ -180,6 +180,7 @@ function frame(frameStart) {
   var inc = true;
   var dec = true;
   // calculate limit
+  console.log(count);
   if (strategy === 'batch') {
     // will try to batch up all update
     inc = scriptDuration < expectedFrame + 1;
@@ -200,8 +201,9 @@ function frame(frameStart) {
     }
   if (count < 1) count = 1;
   scriptStart = window.performance.now();
-  if (!run(count)) // stop {
-    stop();
+  // if (!run(count)) // stop
+  //   stop()
+  run(count);
   scriptEnd = window.performance.now();
   styleStart = frameStart;
 

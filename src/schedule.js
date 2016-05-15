@@ -15,7 +15,7 @@ export function run(count) {
       counter --
       // the bigger of level, the less emergent to complete
       // So we deduce more for higher level (lower priority) actions
-      count = count - i * i
+      count --
       var callback = level.shift()
       if (callback && typeof callback === 'function') callback()
       if (!level.length) {

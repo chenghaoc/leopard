@@ -33,6 +33,7 @@ function frame(frameStart) {
   var inc = true
   var dec = true
   // calculate limit
+  console.log(count);
   if (strategy === 'batch') {
     // will try to batch up all update
     inc =
@@ -60,8 +61,9 @@ function frame(frameStart) {
   if (count < 1)
     count = 1
   scriptStart = window.performance.now()
-  if (!run(count)) // stop {
-    stop()
+  // if (!run(count)) // stop
+  //   stop()
+  run(count)
   scriptEnd = window.performance.now()
   styleStart = frameStart
 

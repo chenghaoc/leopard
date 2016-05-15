@@ -9,8 +9,8 @@ Leopard eliminat janky experiences by scheduling DOM related operation automatic
 
 ## Examples
 
-- [Animation example](http://changbenny.github.io/leoaprd/demo/animation.html)
-- [JavaScript calculation example](http://changbenny.github.io/leoaprd/demo/js-heavy.html)
+- [Animation example](http://changbenny.github.io/leopard/demo/animation.html)
+- [JavaScript calculation example](http://changbenny.github.io/leopard/demo/js-heavy.html)
 
 ## Usage
 

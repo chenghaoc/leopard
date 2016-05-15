@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title></title>
+<link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
+<style>
+html, body {
+  background: #eee;
+}
+body {
+  font-family: 'Roboto', sans-serif;
+  max-width: 700px;
+  margin: 0 auto;
+}
+.panel {
+  margin-top: 10px;
+  margin-bottom: 10px;
+  padding: 10px;
+  background-color: #fff;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+}
+.shadow {
+  box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+}
+.container {
+  height: 300px;
+  width: 300px;
+  overflow: auto;
+}
+.wrapper-l {
+  float: left;
+}
+.wrapper-r {
+  float: right;
+}
+.clearfix {
+  overflow: auto;
+  zoom: 1;
+}
+.content {
+  padding: 5px;
+  text-align: center;
+  margin-bottom: 2px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+  font-size: .8em;
+}
+</style>
+</head>
+
+<body>
+
+<div class='panel'>
+  <a href='https://github.com/changbenny/leopard'><h1>Leopard</h1></a>
+  <h3>Scheduling tasks</h3>
+  <p>
+  The example demonstrate a situation that we sometimes need to display a list with dynamics inserted items.
+  With Leopard, we can schedule the tasks with different priority. Run the tasks with high priority first, make user interaction really smooth.
+  </p>
+</div>
+<div class='panel clearfix'>
+  <div class='wrapper-l'>
+    <button id='with'>Add 50000 items With Leopard</button>
+    <div class='container panel' id='container'></div>
+  </div>
+  <div class='wrapper-r'>
+    <button id='without'>Add 50000 items Without Leopard</button>
+    <div class='container panel' id='container2'></div>
+  </div>
+</div>
+<script src='../build/leopard.min.js'></script>
+<script>
+  var container = document.getElementById('container');
+  var container2 = document.getElementById('container2');
+  document.getElementById('with').addEventListener('click', function(e) {
+    var times = 50000
+    while (times --) {
+      let time = times
+      Leopard.put(1, function() {
+        addContent(container, time)
+      })
+    }
+    Leopard.start({
+      strategy: 'batch'
+    })
+    Leopard.once(1, function() {
+      Leopard.stop()
+    })
+  });
+  document.getElementById('without').addEventListener('click', function(e) {
+    var times = 50000
+    while (times --) {
+      addContent(container2, times)
+    }
+  });
+  function addContent(c, no) {
+    var div = document.createElement('div');
+    div.classList.add('content')
+    div.textContent = no
+    c.appendChild(div)
+  }
+</script>
+</body>
+</html>
