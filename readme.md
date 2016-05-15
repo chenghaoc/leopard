@@ -18,8 +18,7 @@ Leopard eliminat janky experiences by scheduling DOM related operation automatic
 
 ## Examples
 
-- [Animation example](http://changbenny.github.io/leopard/demo/animation.html)
-- [JavaScript calculation example](http://changbenny.github.io/leopard/demo/js-heavy.html)
+- [Lists with large amount of items](http://changbenny.github.io/leopard/demo/)
 
 ## Usage
 
@@ -107,8 +106,9 @@ Stop Leopard.
 | Name     | Type    | Usage                                    | Default  |
 | -------- | ------- | ---------------------------------------- | -------- |
 | limit    | Integer | The limit of actions can be executed per frame. Leopard will adjust this value based on browser performance. | 1000     |
-| strategy | String  | The batching strategy. For pages with heavy DOM manipulation (means lots of page re-layout, re-paint), you should set the value to `batch`, Leopard will batch update. For pages with heavy Calculation with JavaScript, set the option to `normal`, Leopard will schedule those operation for avoiding janky experience. | 'script' |
+| strategy | String  | The batching strategy. For pages with heavy DOM manipulation (means lots of page re-layout, re-paint), you should set the value to `batch`, Leopard will batch update. For pages with heavy Calculation with JavaScript, set the option to `normal`, Leopard will schedule those operation for avoiding janky experience. | 'normal' |
 | perf     | Float   | Tune the performance. Bigger the number, better perfmance , but lower FPS. | 2.0      |
+| autoStop | Boolean | automatically stop if there's no tasks in scheduler queue. | false    |
 
 ## Concept
 
