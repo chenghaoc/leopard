@@ -5,13 +5,14 @@ import { run, enqueue, flush } from './schedule'
 
 const perFrame = 16
 
+// options
 var expectedFrame = perFrame
 var limit = 1000
 var count = limit
 var strategy = 'normal'
 var perf = 2
+var autoStop = false
 
-// var balance = options.limit
 var isRunning = false
 var accelerate = 1 // for slow start
 
@@ -33,7 +34,6 @@ function frame(frameStart) {
   var inc = true
   var dec = true
   // calculate limit
-  console.log(count);
   if (strategy === 'batch') {
     // will try to batch up all update
     inc =
@@ -61,9 +61,9 @@ function frame(frameStart) {
   if (count < 1)
     count = 1
   scriptStart = window.performance.now()
-  // if (!run(count)) // stop
-  //   stop()
-  run(count)
+  var continueRun = run(count)
+  if (!continueRun && autoStop)
+    return
   scriptEnd = window.performance.now()
   styleStart = frameStart
 
@@ -81,7 +81,6 @@ function frame(frameStart) {
 }
 
 export function stop() {
-  console.log('stop');
   accelerate = 1 // for slow start
   count = limit
   isRunning = false
@@ -94,6 +93,7 @@ export function start(options = {}) {
   options.expectedFrame && (expectedFrame = options.expectedFrame)
   options.strategy && (strategy = options.strategy)
   options.perf && (perf = options.perf)
+  options.autoStop && (autoStop = options.autoStop)
   scriptStart = null
   scriptEnd = null
   styleStart = null

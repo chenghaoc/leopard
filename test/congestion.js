@@ -31,7 +31,7 @@ test.cb('put() and start(): multiple times', t => {
   start()
   t.is(results.length, 0)
   setTimeout(() => {
-    t.true(results.length < 200)
+    t.true(results.length <= 200)
     t.end()
   }, 16)
 })
@@ -100,7 +100,7 @@ test.cb('put() and start(): long frame with script strategy', t => {
   }, 16)
 })
 
-test.cb('put() and start(): long frame with style strategy, limit will decrease if janky', t => {
+test.cb('put() and start(): long frame with batch strategy, limit will decrease if janky', t => {
   var results = []
   put(1, function() {
     var times = 1000000
@@ -111,13 +111,39 @@ test.cb('put() and start(): long frame with style strategy, limit will decrease 
   // force the limit to become 1
   start({
     limit: -10000,
-    strategy: 'style'
+    strategy: 'batch'
   })
   t.is(results.length, 0)
   setTimeout(() => {
     t.true(results.length <= 10000000)
     t.end()
   }, 100)
+})
+
+test.cb('put() and start(): auto stop', t => {
+  var results = []
+  put(1, function() {
+    var times = 10
+    while (times --)
+      results.push(1)
+  })
+  
+  // force the limit to become 1
+  start({
+    autoStop: true
+  })
+  t.is(results.length, 0)
+  setTimeout(() => {
+    put(1, function() {
+      var times = 10
+      while (times --)
+        results.push(1)
+    })
+  }, 200)
+  setTimeout(() => {
+    t.is(results.length, 10)
+    t.end()
+  }, 400)
 })
 
 test.cb('emitter once()', t => {
