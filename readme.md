@@ -28,6 +28,7 @@ npm install leopard.js
 ## Examples
 
 - [Lists with large amount of items](http://changbenny.github.io/leopard/demo/)
+- [Image processing](http://changbenny.github.io/leopard/demo/image.html)
 
 ## Usage
 
