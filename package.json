@@ -1,6 +1,6 @@
 {
   "name": "leopard.js",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "60 fps pages made easy.",
   "main": "build/leopard.js",
   "devDependencies": {

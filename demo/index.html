@@ -74,10 +74,11 @@ body {
   document.getElementById('with').addEventListener('click', function(e) {
     var times = 50000
     while (times --) {
-      let time = times
-      Leopard.put(1, function() {
-        addContent(container, time)
-      })
+      (function(time) {
+        Leopard.put(1, function() {
+          addContent(container, time)
+        })
+      }(times))
     }
     Leopard.start({
       strategy: 'batch'
