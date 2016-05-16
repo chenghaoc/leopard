@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+    <style type="text/css">
+    body {
+      width: 100px;
+      margin: 0 auto;
+      background-color: #eee;
+    }
+    .panel {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      width: 200px;
+      padding: 10px;
+      background-color: #fff;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+    }
+    .wrapper {
+      width: 50px;
+      float: left;
+    }
+    .wrapper img {
+      width: 100% !important;
+      height: auto !important;
+    }
+    .wrapper canvas {
+      width: 100% !important;
+      height: auto !important;
+    }
+    </style>
+</head>
+<body>
+<div class='panel'>
+  <p>
+    <h3>Click any leopard images to see the effect.</h3>
+    Image processing is a expensive calculation.
+    The example demonstrate how Leopard improves the responsiveness to user ineraction.
+  </p>
+  <div>
+    <input id='leo' type='checkbox'></input>
+    <label for='leo'>With Leopard</label>
+  </div>
+  <div>
+    <input id='without-leo' type='checkbox'></input>
+    <label for='without-leo'>Without Leopard</label>
+  </div>
+</div>
+<div id='container'>
+  
+</div>
+<div style="display: none;">
+  <div id='tmpl' class='wrapper'>
+    <img src="leopard3.jpg">
+  </div>
+</div>
+
+
+</div>
+<script type="text/javascript" src='http://cdnjs.cloudflare.com/ajax/libs/camanjs/4.0.0/caman.full.min.js'></script>
+<script src='../build/leopard.min.js'></script>
+<script type="text/javascript">
+var clicltype
+if (window.location.search[window.location.search.length - 1] == 'l') {
+  document.querySelector('#without-leo').checked = true
+  clicltype = click
+} else {
+  document.querySelector('#leo').checked = true
+  clicltype = leopardClick
+}
+
+var ran = false
+function start() {
+  var times = 1000
+  var tmpl = document.getElementById('tmpl')
+  var container = document.getElementById('container')
+  while (container.firstChild)
+    container.removeChild(container.firstChild)
+  while (times --) {
+    var clone = tmpl.cloneNode(true)
+    clone.setAttribute('data-id', times);
+    clone.setAttribute('id', times);
+    clone.childNodes[1].classList.add('target')
+    container.insertBefore(clone, container.firstChild)
+  }
+  Array.from(document.querySelectorAll('.target')).forEach((item, index) => {
+    item.addEventListener('click', function(e) {
+      clicltype(e.target)
+    })
+  })
+}
+
+start()
+document.querySelector('#without-leo').addEventListener('change', function(e) {
+  clicltype = click
+  ran && (location.href = location.href + '?l')
+  document.querySelector('#leo').checked = false
+})
+document.querySelector('#leo').addEventListener('change', function(e) {
+  clicltype = leopardClick
+  ran && (location.href = location.href + '?w')
+  document.querySelector('#without-leo').checked = false
+})
+function leopardClick(self) {
+  ran = true
+  var id = self.parentNode.getAttribute('data-id');
+  Leopard.put(1, function() {
+    Caman(self, function () {
+      this.brightness(30);
+      this.render();
+    })
+  })
+  Leopard.put(1, function() {
+    var targets = Array.from(document.querySelectorAll('.target'))
+    targets.slice(0, parseInt(id) +1).reverse().forEach((item, index) => {
+      Leopard.put(index, function() {
+        Caman(item, function () {
+          this.brightness(-50);
+          this.render();
+        })
+      })
+    })
+    targets.slice(parseInt(id) -1).forEach((item, index) => {
+      Leopard.put(index, function() {
+        Caman(item, function () {
+          this.brightness(-50);
+          this.render();
+        })
+      })
+    })
+  })
+    
+  Leopard.start({
+    limit: 100,
+    autoStop: true,
+  })
+}
+function click(self) {
+  ran = true
+  Caman(self, function () {
+    this.brightness(30);
+    this.render();
+  })
+  Array.from(document.querySelectorAll('.target'))
+    .forEach((item, index) => {
+      Caman(item, function () {
+        this.brightness(-50);
+        this.render();
+      })
+  })
+    
+}
+</script>
+</body>
+</html>
