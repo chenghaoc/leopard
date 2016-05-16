@@ -84,7 +84,7 @@ function start() {
     clone.childNodes[1].classList.add('target')
     container.insertBefore(clone, container.firstChild)
   }
-  Array.from(document.querySelectorAll('.target')).forEach((item, index) => {
+  Array.from(document.querySelectorAll('.target')).forEach(function (item, index) {
     item.addEventListener('click', function(e) {
       clicltype(e.target)
     })
@@ -113,7 +113,7 @@ function leopardClick(self) {
   })
   Leopard.put(1, function() {
     var targets = Array.from(document.querySelectorAll('.target'))
-    targets.slice(0, parseInt(id) +1).reverse().forEach((item, index) => {
+    targets.slice(0, parseInt(id) +1).reverse().forEach(function (item, index) {
       Leopard.put(index, function() {
         Caman(item, function () {
           this.brightness(-50);
@@ -121,7 +121,7 @@ function leopardClick(self) {
         })
       })
     })
-    targets.slice(parseInt(id) -1).forEach((item, index) => {
+    targets.slice(parseInt(id) -1).forEach(function (item, index) {
       Leopard.put(index, function() {
         Caman(item, function () {
           this.brightness(-50);
@@ -143,7 +143,7 @@ function click(self) {
     this.render();
   })
   Array.from(document.querySelectorAll('.target'))
-    .forEach((item, index) => {
+    .forEach(function (item, index) {
       Caman(item, function () {
         this.brightness(-50);
         this.render();
