@@ -13,10 +13,7 @@ var Leopard = {
   once: emitter.once.bind(emitter),
   start,
   stop,
-  put,
-  get limit() {
-    return getCount()
-  }
+  put
 }
 
 if (typeof exports === 'object')

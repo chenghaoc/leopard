@@ -1,6 +1,7 @@
 var Emitter = function() {
   this.uid = 0
   this.handlers = []
+  // 1000 is specific for the level of scheduler
   for (let i = 0; i < 1000; i ++) this.handlers.push([])
 }
 Emitter.prototype.on = function(level, callback) {

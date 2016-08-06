@@ -109,11 +109,11 @@ When all tasks in one priority queue finish, Leopard will fire an event. Your c
 | perf     | Float   | Tune the performance. Bigger the number, better perfmance , but lower FPS. | 2.0      |
 | autoStop | Boolean | automatically stop if there's no tasks in scheduler queue. | false    |
 
-## Concept
+## Concept and Implementation
 
-The algorithm for calculating maximum actions per frames is inspired by *TCP congestion control*. 
+The algorithm for calculating maximum actions per frames is inspired by *TCP congestion control*. Take a look of [`src/congestion.js` ](https://github.com/changbenny/leopard/blob/master/src/congestion.js) for detailed implementation.
 
-The scheduler for scheduling the prioritised actions is based on *Fixed priority none-preemptive scheduling*. You specify the priority of tasks by yourself. Be careful about number of tasks you assign to the scheduler. Too many tasks in a scheduler queue will cause [Starvation](https://en.wikipedia.org/wiki/Starvation_(computer_science)).
+The scheduler for scheduling the prioritised actions is based on *Fixed priority none-preemptive scheduling*. Take a look of [`src/schedule.js`](https://github.com/changbenny/leopard/blob/master/src/schedule.js) for detailed implementation. You specify the priority of tasks by yourself. Be careful about number of tasks you assign to the scheduler. Too many tasks in a scheduler queue will cause [Starvation](https://en.wikipedia.org/wiki/Starvation_(computer_science)).
 
 
 

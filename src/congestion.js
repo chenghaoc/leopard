@@ -1,7 +1,8 @@
-import _ from './rAF'
-import __ from './now'
 import { run, enqueue, flush } from './schedule'
-
+// Cause side effects
+import './rAF'
+import './now'
+//
 
 const perFrame = 16
 
@@ -23,6 +24,13 @@ var styleEnd
 
 var styleDuration
 var scriptDuration
+
+/*
+ * The main entry point:
+ * We execute frame via requestAnimationFrame, based on previous execution we can
+ * calculate how many works we can do for this frame.
+ * Therefore, Leopard is suitable for some consistant operations, such as rendering update.
+ */
 
 function frame(frameStart) {
   if (!isRunning) return
@@ -80,6 +88,12 @@ function frame(frameStart) {
   }
 }
 
+/*
+ * Public API:
+ * start, stop, put
+ * 
+ */
+
 export function stop() {
   accelerate = 1 // for slow start
   count = limit
@@ -102,7 +116,4 @@ export function start(options = {}) {
 }
 export function put(priority, callback, times) {
   enqueue(priority, callback, times)
-}
-export function getCount() {
-  return count
 }
